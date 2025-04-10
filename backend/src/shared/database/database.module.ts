@@ -1,7 +1,16 @@
+import * as crypto from 'crypto';
+import { Logger } from '@nestjs/common';
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+
+
+// Solución temporal para el error de crypto
+if (typeof globalThis.crypto === 'undefined') {
+  globalThis.crypto = crypto as any;
+}
 
 @Module({
   imports: [
@@ -19,22 +28,38 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             SecretId: 'my-secret'
         });
 
-        const { host, username, password, database, port } = JSON.parse(secret.SecretString);
+        // Añade debug para inspeccionar la respuesta
+        Logger.debug(`Secret raw response: ${JSON.stringify(secret)}`, 'DatabaseModule');
+
+        // Verifica si SecretString existe
+        if (!secret.SecretString) {
+          throw new Error('SecretString is undefined in the response');
+        }
+
+        let dbConfig: any = {};
+        try {
+          dbConfig = JSON.parse(secret.SecretString);
+        } catch (e) {
+          Logger.error(`Failed to parse secret: ${secret.SecretString}`, e.stack, 'DatabaseModule');
+          throw new Error('Invalid secret JSON format');
+        }
+
+        // Verifica las propiedades mínimas requeridas
+        if (!dbConfig.host || !dbConfig.username || !dbConfig.password || !dbConfig.database) {
+          throw new Error('Missing required database configuration in secret');
+        }
 
         return {
-          type: 'mssql',    
-          host,
-          port,
-          username,
-          password,
-          database,
+          type: 'postgres',
+          ... dbConfig,
           entities: [__dirname + '/../**/*.entity{.ts,.js}'],
           synchronize: true,
           options: {
             encrypt: false,
             trustServerCertificate: true // Para desarrollo local
           }
-        };
+        }
+
       }
     })
   ]
