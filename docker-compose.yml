@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    ports:
+      - "4566:4566"            # Puerto principal de LocalStack
+      - "4510-4559:4510-4559"  # Puertos para servicios externos
+    environment:
+      - SERVICES=secretsmanager,lambda,s3,amplify
+      - DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - DEBUG=1
+      - LAMBDA_DOCKER_NETWORK=proyecto_default
+    volumes:
+      - ./localstack:/docker-entrypoint-initaws.d
+      - /var/run/docker.sock:/var/run/docker.sock
