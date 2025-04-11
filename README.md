@@ -9,9 +9,9 @@ docker-compose up -d
 aws --endpoint-url=http://localhost:4566 s3 mb s3://my-bucket
 
 # Crear secrets conexion base de datos
-aws --endpoint-url=http://localhost:4566 secretsmanager create-secret --name my-db-secret --secret-string '{"host":"IL_DIAVOLO\\\\SQLEXPRESS", "port":"1433", "username":"sa", "password":"Testlocal", "database":"ProductManagement"}'
-
-aws --endpoint-url=http://localhost:4566 secretsmanager create-secret --name my-db-secret --secret-string '{"username": "sa","password": "Testlocal","host": "host.docker.internal","port": "1433","instance": "SQLEXPRESS", "database": "ProductManagement", "type": "mssql"}'
+aws --endpoint-url=http://localhost:4566 secretsmanager create-secret `
+--name my-db-secret `
+--secret-string '{\"name\":\"testConection\",\"type\":\"mssql\",\"host\":\"localhost/SQLEXPRESS\",\"username\":\"sa\",\"password\":\"Testlocal\",\"database\":\"ProductManagement\",\"schema\":\"dbo\"}'
 
 # Verificar creación:
 aws --endpoint-url=http://localhost:4566 secretsmanager list-secrets

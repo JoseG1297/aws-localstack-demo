@@ -16,25 +16,44 @@ export class DatabaseModule {
   static async forRootAsync(): Promise<any> {
     const secretsProvider = new SecretsManagerProvider();
 
-    const dbSecrets = await secretsProvider.getSecretValue('my-db-secret');
-    // const dbConfig = JSON.parse(dbSecrets);
+    const dbSecrets = await secretsProvider.getSecretValue('my-db-secret-tres');
+    
+    Logger.log('dbSecrets', dbSecrets);
+    let dbConfig: any = {};
+
+    try {
+      dbConfig = JSON.parse(dbSecrets);
+      Logger.log('dbConfig', dbConfig);
+    }
+    catch (error) { 
+      Logger.error('Error parsing dbConfig', error);
+      const fixedJson = dbSecrets
+            .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')  // Agrega comillas a claves
+            .replace(/:\s*([a-zA-Z0-9_\\\/\.]+)(\s*[,}])/g, ': "$1"$2') // Agrega comillas a valores
+            .replace(/\\\\/g, '\\');
+
+          dbConfig = JSON.parse(fixedJson);  
+      }
+
 
     return{
       module: DatabaseModule,
       imports: [
         TypeOrmModule.forRoot({
-          name: 'testConection',
-          type: 'mssql',
-          host: 'DESKTOP-483GBIT/SQLEXPRESS',
-          username: 'sa',
-          password: 'Testlocal',
-          database: 'ProductManagement',
-          schema:'dbo',
+          name: dbConfig.name,
+          type: dbConfig.type,
+          host: dbConfig.host,
+          username: dbConfig.username,
+          password: dbConfig.password,
+          database: dbConfig.database,
+          schema: dbConfig.schema,
           synchronize: false,
           extra: {
             trustServerCertificate: true,
             encrypt: false,
           },
+          logging: true,
+          logger: 'advanced-console'
         })
       ]
     };
