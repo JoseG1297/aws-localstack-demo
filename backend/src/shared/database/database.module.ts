@@ -25,7 +25,7 @@ export class DatabaseModule {
         TypeOrmModule.forRoot({
           name: 'testConection',
           type: 'mssql',
-          host: 'IL_DIAVOLO/SQLEXPRESS',
+          host: 'DESKTOP-483GBIT/SQLEXPRESS',
           username: 'sa',
           password: 'Testlocal',
           database: 'ProductManagement',
