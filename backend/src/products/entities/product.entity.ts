@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+import { Users } from '../../users/entities/user.entity';
 
 @Entity()
-export class Product {
+export class Products {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -15,15 +15,18 @@ export class Product {
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
+  @Column({ nullable: true })
+  stock: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User)
-  createdBy: User;
+  @ManyToOne(() => Users)
+  createdBy: Users;
 
-  @ManyToOne(() => User, { nullable: true })
-  updatedBy: User;
+  @ManyToOne(() => Users, { nullable: true })
+  updatedBy: Users;
 }

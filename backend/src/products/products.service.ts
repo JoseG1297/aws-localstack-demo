@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Product } from './entities/product.entity';
-import { User } from '../users/entities/user.entity';
+import { Products } from './entities/product.entity';
+import { Users } from '../users/entities/user.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectRepository(Product, 'testConection')
-    private readonly productRepository: Repository<Product>,
-    @InjectRepository(User, 'testConection')
-    private readonly userRepository: Repository<User>
+    @InjectRepository(Products, 'testConection')
+    private readonly productRepository: Repository<Products>,
+    @InjectRepository(Users, 'testConection')
+    private readonly userRepository: Repository<Users>
   ) {}
 
   async create(createProductDto: CreateProductDto, userId: string) {

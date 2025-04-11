@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
-import { Product } from '../../products/entities/product.entity';
+import { Products } from '../../products/entities/product.entity';
 
 @Entity()
-export class User {
+export class Users {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -12,12 +12,9 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  password: string;
-
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToMany(() => Product, product => product.createdBy)
-  products: Product[];
+  @OneToMany(() => Products, product => product.createdBy)
+  products: Products[];
 }
