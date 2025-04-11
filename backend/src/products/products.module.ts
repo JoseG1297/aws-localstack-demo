@@ -6,7 +6,7 @@ import { Product } from './entities/product.entity';
 import { User } from '../users/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product, User])],
+  imports: [TypeOrmModule.forFeature([Product, User], 'testConection')],
   controllers: [ProductsController],
   providers: [ProductsService],
   exports: [ProductsService]

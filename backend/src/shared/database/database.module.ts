@@ -4,6 +4,8 @@ import { Logger } from '@nestjs/common';
 import { Module } from '@nestjs/common';
 import { SecretsManagerProvider } from '../aws/secrets.provider';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Product } from 'src/products/entities/product.entity';
+import { User } from 'src/users/entities/user.entity';
 
 
 // Solución temporal para el error de crypto
@@ -48,6 +50,7 @@ export class DatabaseModule {
           database: dbConfig.database,
           schema: dbConfig.schema,
           synchronize: false,
+          entities: [User, Product], // Ruta global
           extra: {
             trustServerCertificate: true,
             encrypt: false,

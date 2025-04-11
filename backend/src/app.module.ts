@@ -10,7 +10,7 @@ import { ProductsModule } from './products/products.module';
       envFilePath: '.env'
     }),
     DatabaseModule.forRootAsync(),
-    // ProductsModule
+    ProductsModule
   ],
 })
 export class AppModule {}
