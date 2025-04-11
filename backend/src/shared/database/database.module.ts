@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common';
 
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SecretsManager } from '@aws-sdk/client-secrets-manager';
+import { SecretsManager } from 'aws-sdk';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 
@@ -25,11 +25,11 @@ if (typeof globalThis.crypto === 'undefined') {
         });
 
         const secret = await secretsManager.getSecretValue({
-            SecretId: 'my-db-secret'
-        });
+          SecretId: 'my-db-secret'
+        }).promise();
 
 
-        const secretString = secret.SecretString || '';
+        const secretString = secret.SecretString as string;
        
         let dbConfig: any = {};
         // Primero intenta parsear como JSON estándar
@@ -40,8 +40,8 @@ if (typeof globalThis.crypto === 'undefined') {
           const fixedJson = secretString
             .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')  // Agrega comillas a claves
             .replace(/:\s*([a-zA-Z0-9_\\\/\.]+)(\s*[,}])/g, ': "$1"$2') // Agrega comillas a valores
-            .replace(/\\\\/g, '\\'); // Reduce las barras escapadas
-
+            .replace(/\\\\/g, '\\');
+            
             dbConfig = JSON.parse(fixedJson);
         }
 
@@ -52,14 +52,23 @@ if (typeof globalThis.crypto === 'undefined') {
 
         return {
           type: 'mssql',
-          ... dbConfig,
-          entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-          synchronize: false,
+          host: 'IL_DIAVOLO', // Usa doble barra o barra simple
+          username: 'sa',
+          password: 'Testlocal',
+          database: 'ProductManagement',
           options: {
             encrypt: false,
-            trustedConnection: false
+            trustServerCertificate: true, // Necesario para desarrollo
+            instanceName: 'SQLEXPRESS' // Especifica el nombre de instancia
+          },
+          connectionTimeout: 30000, // Aumenta timeout
+          requestTimeout: 30000,
+          pool: {
+            max: 10,
+            min: 0,
+            idleTimeoutMillis: 30000
           }
-        }
+        };
 
       }
     })
