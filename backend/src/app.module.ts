@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './shared/database/database.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -8,9 +9,8 @@ import { DatabaseModule } from './shared/database/database.module';
       isGlobal: true,
       envFilePath: '.env'
     }),
-    DatabaseModule,
+    DatabaseModule.forRootAsync(),
+    // ProductsModule
   ],
-  controllers: [],
-  providers: []
 })
 export class AppModule {}
