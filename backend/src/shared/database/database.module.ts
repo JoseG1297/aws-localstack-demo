@@ -25,23 +25,24 @@ if (typeof globalThis.crypto === 'undefined') {
         });
 
         const secret = await secretsManager.getSecretValue({
-            SecretId: 'my-secret'
+            SecretId: 'my-db-secret'
         });
 
-        // Añade debug para inspeccionar la respuesta
-        Logger.debug(`Secret raw response: ${JSON.stringify(secret)}`, 'DatabaseModule');
 
-        // Verifica si SecretString existe
-        if (!secret.SecretString) {
-          throw new Error('SecretString is undefined in the response');
-        }
-
+        const secretString = secret.SecretString || '';
+       
         let dbConfig: any = {};
+        // Primero intenta parsear como JSON estándar
         try {
-          dbConfig = JSON.parse(secret.SecretString);
+          dbConfig = JSON.parse(secretString);
         } catch (e) {
-          Logger.error(`Failed to parse secret: ${secret.SecretString}`, e.stack, 'DatabaseModule');
-          throw new Error('Invalid secret JSON format');
+          // Si falla, convierte el formato no estándar a JSON válido
+          const fixedJson = secretString
+            .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')  // Agrega comillas a claves
+            .replace(/:\s*([a-zA-Z0-9_\\\/\.]+)(\s*[,}])/g, ': "$1"$2') // Agrega comillas a valores
+            .replace(/\\\\/g, '\\'); // Reduce las barras escapadas
+
+            dbConfig = JSON.parse(fixedJson);
         }
 
         // Verifica las propiedades mínimas requeridas
@@ -50,13 +51,13 @@ if (typeof globalThis.crypto === 'undefined') {
         }
 
         return {
-          type: 'postgres',
+          type: 'mssql',
           ... dbConfig,
           entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-          synchronize: true,
+          synchronize: false,
           options: {
             encrypt: false,
-            trustServerCertificate: true // Para desarrollo local
+            trustedConnection: false
           }
         }
 
@@ -64,4 +65,5 @@ if (typeof globalThis.crypto === 'undefined') {
     })
   ]
 })
+
 export class DatabaseModule {}
