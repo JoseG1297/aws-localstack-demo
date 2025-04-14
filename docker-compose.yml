@@ -1,21 +1,19 @@
-version: '3.8'
-
 services:
+  # Emulador de Cognito (cognito-local)
+  cognito:
+    image: jagregory/cognito-local:latest
+    ports:
+      - "9229:9229"
+    environment:
+      - REGION=us-east-1
+      - DEBUG=1
+  # LocalStack para otros servicios AWS (S3, DynamoDB, etc.)
   localstack:
     image: localstack/localstack
-    container_name: localstack
     ports:
-      - "4566:4566"            # Puerto principal de LocalStack
-      - "4510-4559:4510-4559"  # Puertos para servicios externos
+        - "4566:4566"            # Puerto principal de LocalStack
+        - "4510-4559:4510-4559"  # Puertos para servicios externos
     environment:
-      - SERVICES=secretsmanager,lambda,s3,amplify
+      - SERVICES=secretsmanager,s3,dynamodb,lambda  # Servicios a emular (ajusta según necesites)
       - DEFAULT_REGION=us-east-1
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
       - DEBUG=1
-      - LAMBDA_DOCKER_NETWORK=proyecto_default
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    volumes:
-      - ./localstack:/docker-entrypoint-initaws.d
-      - /var/run/docker.sock:/var/run/docker.sock
