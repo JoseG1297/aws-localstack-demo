@@ -1,0 +1,140 @@
+{
+    "info": {
+      "_postman_id": "a1b2c3d4-e5f6-7890",
+      "name": "Cognito-local",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Create User Pool (no verification)",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "X-Amz-Target",
+              "value": "AWSCognitoIdentityProviderService.CreateUserPool"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/x-amz-json-1.1"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"PoolName\": \"MyNoVerificationPool\",\n    \"AutoVerifiedAttributes\": [],\n    \"AdminCreateUserConfig\": {\n        \"AllowAdminCreateUserOnly\": false\n    },\n    \"Policies\": {\n        \"PasswordPolicy\": {\n            \"MinimumLength\": 6,\n            \"RequireUppercase\": false,\n            \"RequireLowercase\": false,\n            \"RequireNumbers\": false,\n            \"RequireSymbols\": false\n        }\n    },\n    \"Schema\": [\n        {\n            \"Name\": \"email\",\n            \"AttributeDataType\": \"String\",\n            \"Required\": true,\n            \"Mutable\": true\n        }\n    ]\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/",
+            "host": ["{{base_url}}"],
+            "path": [""]
+          }
+        }
+      },
+      {
+        "name": "Create App Client",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "X-Amz-Target",
+              "value": "AWSCognitoIdentityProviderService.CreateUserPoolClient"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/x-amz-json-1.1"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"UserPoolId\": \"<USER_POOL_ID>\",\n    \"ClientName\": \"MyAppClient\",\n    \"GenerateSecret\": false,\n    \"ExplicitAuthFlows\": [\n        \"ALLOW_ADMIN_USER_PASSWORD_AUTH\",\n        \"ALLOW_USER_PASSWORD_AUTH\",\n        \"ALLOW_REFRESH_TOKEN_AUTH\"\n    ]\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/",
+            "host": ["{{base_url}}"],
+            "path": [""]
+          }
+        }
+      },
+      {
+        "name": "Create User (Admin)",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "X-Amz-Target",
+              "value": "AWSCognitoIdentityProviderService.AdminCreateUser"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/x-amz-json-1.1"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"UserPoolId\": \"<USER_POOL_ID>\",\n    \"Username\": \"testuser\",\n    \"TemporaryPassword\": \"TempPass123\",\n    \"UserAttributes\": [\n        {\n            \"Name\": \"email\",\n            \"Value\": \"test@example.com\"\n        }\n    ],\n    \"MessageAction\": \"SUPPRESS\"\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/",
+            "host": ["{{base_url}}"],
+            "path": [""]
+          }
+        }
+      },
+      {
+        "name": "Sign Up",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "X-Amz-Target",
+              "value": "AWSCognitoIdentityProviderService.SignUp"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/x-amz-json-1.1"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"ClientId\": \"<CLIENT_ID>\",\n    \"Username\": \"testuser2\",\n    \"Password\": \"Password123\",\n    \"UserAttributes\": [\n        {\n            \"Name\": \"email\",\n            \"Value\": \"test2@example.com\"\n        }\n    ]\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/",
+            "host": ["{{base_url}}"],
+            "path": [""]
+          }
+        }
+      },
+      {
+        "name": "Authenticate",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "X-Amz-Target",
+              "value": "AWSCognitoIdentityProviderService.InitiateAuth"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/x-amz-json-1.1"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"ClientId\": \"<CLIENT_ID>\",\n    \"AuthFlow\": \"USER_PASSWORD_AUTH\",\n    \"AuthParameters\": {\n        \"USERNAME\": \"testuser\",\n        \"PASSWORD\": \"Password123\"\n    }\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/",
+            "host": ["{{base_url}}"],
+            "path": [""]
+          }
+        }
+      }
+    ],
+    "variable": [
+      {
+        "key": "base_url",
+        "value": "http://localhost:9229"
+      }
+    ]
+  }
